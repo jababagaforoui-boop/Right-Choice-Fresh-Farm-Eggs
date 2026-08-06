@@ -38,8 +38,8 @@ $stock_alerts = [];
 
 if(isset($_POST['add_sale'])){
 
-    $big_trays_sold   = (int)$_POST['big_trays_sold'];
-    $small_trays_sold = (int)$_POST['small_trays_sold'];
+   $requested_big   = (int)$_POST['big_trays_sold'];
+   $requested_small = (int)$_POST['small_trays_sold'];
 
     $custom_big_price = (!empty($_POST['big_price']))
     ? (float)$_POST['big_price']
@@ -57,6 +57,10 @@ $custom_small_price = (!empty($_POST['small_price']))
 
     $current_big   = $inventory['big_trays'] ?? 0;
     $current_small = $inventory['small_trays'] ?? 0;
+
+    // Only sell what is actually available
+    $big_trays_sold   = min($requested_big, $current_big);
+    $small_trays_sold = min($requested_small, $current_small);
 
     $new_big   = max(0, $current_big - $big_trays_sold);
     $new_small = max(0, $current_small - $small_trays_sold);
@@ -116,20 +120,40 @@ $success_request = '';
 $error_request = '';
 
 if(isset($_POST['request_admin'])){
+
     $request_big   = (int)$_POST['request_big_trays'];
     $request_small = (int)$_POST['request_small_trays'];
     $message       = trim($_POST['message']);
 
+    // Get current inventory
+    $stmt = $conn->prepare("SELECT big_trays, small_trays FROM inventory WHERE branch_id=? LIMIT 1");
+    $stmt->bind_param("i", $branch_id);
+    $stmt->execute();
+    $inventory = $stmt->get_result()->fetch_assoc();
+
+    $current_big   = (int)($inventory['big_trays'] ?? 0);
+    $current_small = (int)($inventory['small_trays'] ?? 0);
+
     if($request_big < 0 || $request_small < 0 || empty($message)){
+
         $error_request = "⚠ Please fill all fields correctly.";
-    } else {
+
+    }elseif($current_big == 0 || $current_small == 0){
+
+        // Allow request if either stock is already zero
         $stmt_req = $conn->prepare("
             INSERT INTO requests(branch_id, big_trays, small_trays, message, status, request_datetime)
             VALUES (?,?,?,?, 'pending', NOW())
         ");
         $stmt_req->bind_param("iiis", $branch_id, $request_big, $request_small, $message);
         $stmt_req->execute();
+
         $success_request = "📨 Request sent successfully!";
+
+    }else{
+
+        $error_request = "⚠ You can only request new stocks when one of your tray stocks reaches zero.";
+
     }
 }
 
