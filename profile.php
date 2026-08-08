@@ -1,127 +1,144 @@
 <?php
 include __DIR__ . '/backend/profile_backend.php';
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Profile - <?php echo htmlspecialchars($user['fullname'] ?? $user['username']); ?></title>
+<title>Admin Profile & Dashboard - Fresh Farm Egg</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
-body{display:flex;background:#f0fdf4;min-height:100vh;}
-
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Verdana,Tahoma;}
+body{background:#e6f4ea;}
+.wrapper{display:flex;min-height:100vh;}
 /* Sidebar */
 .sidebar{
-    width:220px;background:#38b000;color:#fff;height:100vh;position:fixed;display:flex;flex-direction:column;padding:20px;
+    width:240px;
+    background:#38b000;
+    color:#fff;
+    padding:25px;
+    display:flex;
+    flex-direction:column;
 }
-.sidebar h2{text-align:center;margin-bottom:40px;}
+.sidebar h2{text-align:center;font-size:1.8rem;margin-bottom:30px;font-weight:700;}
 .sidebar a{
-    display:flex;align-items:center;padding:12px 15px;margin-bottom:15px;background:#2d6a4f;border-radius:10px;color:#fff;text-decoration:none;font-weight:bold;transition:0.3s;
+    display:flex; align-items:center; gap:10px;
+    padding:12px 18px;
+    margin-bottom:10px;
+    background:#2d6a4f;
+    color:#fff;
+    border-radius:10px;
+    font-weight:600;
+    text-decoration:none;
+    transition:0.3s;
 }
-.sidebar a i{margin-right:10px;}
-.sidebar a:hover{background:#70d6ff;color:#000;}
-.sidebar .logout{background:#d00000;margin-top:auto;}
-.sidebar .logout:hover{background:#9d0208;}
-
-/* Main content */
-.main{margin-left:220px;padding:25px;flex:1;}
-
-/* Cards */
-.card{background:#fff;border-radius:15px;padding:25px;box-shadow:0 5px 15px rgba(0,0,0,0.08);margin-bottom:25px;}
-.card h2{color:#2d6a4f;margin-bottom:20px;}
-
-/* Profile Form */
-input,textarea,button{padding:12px;margin-bottom:15px;width:100%;border-radius:10px;border:1px solid #ccc;font-size:1em;}
-button{background:#38b000;color:#fff;border:none;font-weight:bold;cursor:pointer;transition:0.3s;}
-button:hover{background:#2d6a4f;}
-.success-msg{color:green;font-weight:bold;margin-bottom:15px;}
-.error-msg{color:red;font-weight:bold;margin-bottom:15px;}
-.profile-photo{width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:15px;border:2px solid #2d6a4f;display:block;margin-left:auto;margin-right:auto;}
-.info-row{margin-bottom:15px;}
-.info-label{font-weight:bold;margin-bottom:5px;display:block;}
-.branch-info{color:#2d6a4f;font-weight:bold;margin-bottom:15px;text-align:center;}
+.sidebar a i{width:20px;text-align:center;}
+.sidebar a.active, .sidebar a:hover{background:#70d6ff;color:#000;}
+.sidebar .logout{background:#d90429;margin-top:auto;}
+.sidebar .logout:hover{background:#9b0a20;}
+/* Main */
+.main-content{flex:1;padding:30px;}
+.header h1{font-size:2.2rem;color:#2d6a4f;margin-bottom:5px;}
+.header p{color:#52796f;font-size:1rem;margin-bottom:20px;}
+/* Flex cards */
+.cards-container{display:flex;gap:30px;flex-wrap:wrap;justify-content:center;}
+/* Profile Card */
+.profile-card, .info-card{
+    background:#fff;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.1);
+    flex:1;
+    min-width:300px;
+}
+.profile-card{text-align:center;}
+.profile-img{
+    width:150px;height:150px;border-radius:50%;object-fit:cover;border:3px solid #38b000;margin-bottom:20px;
+}
+.profile-info p{font-size:1.1rem;margin:6px 0;}
+form{width:100%; margin-top:15px;}
+input[type="text"], input[type="email"], input[type="password"], input[type="file"]{
+    width:100%; padding:12px; border-radius:8px; border:1px solid #ccc; margin-bottom:12px; font-size:1rem;
+}
+button.upload-btn, button.update-btn, .btn-profile{
+    display:inline-block; padding:12px 25px; background:#38b000; color:#fff; border-radius:25px; font-weight:bold; cursor:pointer; transition:0.3s; margin-top:10px; border:none;
+}
+button.upload-btn:hover, button.update-btn:hover, .btn-profile:hover{background:#2d6a4f; transform:translateY(-2px);}
+.success-msg{color:green;font-weight:bold;margin-bottom:10px;}
+.error-msg{color:red;font-weight:bold;margin-bottom:10px;}
+/* Info Card */
+.info-card h3{margin-bottom:15px;color:#2d6a4f;text-align:center;}
+.info-item{display:flex;justify-content:space-between;padding:12px 15px;background:#f3f8f5;margin-bottom:10px;border-radius:8px;font-weight:600;}
+/* Responsive */
+@media(max-width:768px){
+    .sidebar{width:100%;flex-direction:row;overflow-x:auto;height:auto;padding:15px;}
+    .sidebar a{margin-right:8px;margin-bottom:0;}
+    .main-content{padding:20px;}
+    .cards-container{flex-direction:column;align-items:center;}
+}
 </style>
 </head>
 <body>
 
-<div class="sidebar">
-<h2>Client Panel</h2>
-<a href="dashboard.php"><i class="fas fa-home"></i> Home</a>
-<a href="add_deliveries.php"><i class="fas fa-truck"></i> Deliveries</a>
-<a href="orders.php"><i class="fas fa-list"></i> Orders</a>
-<a href="stocks.php"><i class="fas fa-boxes"></i> Stocks</a>
-<a href="returns.php"><i class="fas fa-undo"></i> Returns</a>
-<a href="profile.php"><i class="fas fa-user"></i> Profile</a>
-<a href="../index.html" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-</div>
+<div class="wrapper">
 
-<div class="main">
-
-<div class="card">
-<h2>👤 Client Profile - <?php echo htmlspecialchars($user['fullname'] ?? $user['username']); ?></h2>
-<?php if(!empty($user['branch'])): ?>
-<p class="branch-info"><i class="fas fa-map-marker-alt"></i> Branch: <?php echo htmlspecialchars($user['branch']); ?></p>
-<?php endif; ?>
-
-<?php if($success_msg): ?><div class="success-msg"><?php echo $success_msg; ?></div><?php endif; ?>
-<?php if($error_msg): ?><div class="error-msg"><?php echo $error_msg; ?></div><?php endif; ?>
-
-<img src="<?php echo !empty($user['photo']) ? htmlspecialchars($user['photo']) : 'https://via.placeholder.com/120?text=No+Photo'; ?>" alt="Profile Photo" class="profile-photo" id="profilePreview">
-
-<form method="post" enctype="multipart/form-data">
-    <div class="info-row">
-        <label class="info-label" for="photo"><i class="fas fa-camera"></i> Profile Photo</label>
-        <input type="file" name="photo" id="photo" accept="image/*" onchange="previewPhoto(event)">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Admin Panel</h2>
+        <a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="profile.php" class="active"><i class="fas fa-user"></i> Profile</a>
+        <a href="../index.html" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
     </div>
 
-    <div class="info-row">
-        <label class="info-label" for="username"><i class="fas fa-user"></i> Username</label>
-        <input type="text" name="username" id="username" value="<?php echo htmlspecialchars($user['username']); ?>" required>
-    </div>
+    <!-- Main -->
+    <div class="main-content">
+        <div class="header">
+            <h1>Admin Profile & Dashboard</h1>
+            <p>Manage your profile and view key information</p>
+        </div>
 
-    <div class="info-row">
-        <label class="info-label" for="fullname"><i class="fas fa-id-card"></i> Full Name</label>
-        <input type="text" name="fullname" id="fullname" value="<?php echo htmlspecialchars($user['fullname'] ?? ''); ?>">
-    </div>
+        <?php if($success) echo "<p class='success-msg'>$success</p>"; ?>
+        <?php if($error) echo "<p class='error-msg'>$error</p>"; ?>
 
-    <div class="info-row">
-        <label class="info-label" for="email"><i class="fas fa-envelope"></i> Email</label>
-        <input type="email" name="email" id="email" value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>">
-    </div>
+        <div class="cards-container">
 
-    <div class="info-row">
-        <label class="info-label" for="contact"><i class="fas fa-phone"></i> Contact Number</label>
-        <input type="text" name="contact" id="contact" value="<?php echo htmlspecialchars($user['contact'] ?? ''); ?>">
-    </div>
+            <!-- Profile Card -->
+            <div class="profile-card">
+                <img src="../uploads/<?= htmlspecialchars($profile_pic) ?>" alt="Profile Picture" class="profile-img">
+                <div class="profile-info">
+                    <p><strong>Name:</strong> <?= htmlspecialchars($user_name) ?></p>
+                    <p><strong>Email:</strong> <?= htmlspecialchars($user_email) ?></p>
+                    <p><strong>Role:</strong> <?= htmlspecialchars($user_role) ?></p>
+                </div>
 
-    <div class="info-row">
-        <label class="info-label" for="password"><i class="fas fa-key"></i> New Password (leave blank to keep current)</label>
-        <input type="password" name="password" id="password">
-    </div>
+                <form method="post" enctype="multipart/form-data">
+                    <input type="file" name="profile_image" accept="image/*" required>
+                    <button type="submit" name="upload" class="upload-btn">Upload Profile Picture</button>
+                </form>
 
-    <div class="info-row">
-        <label class="info-label" for="confirm_password"><i class="fas fa-key"></i> Confirm New Password</label>
-        <input type="password" name="confirm_password" id="confirm_password">
-    </div>
+                <form method="post">
+                    <input type="text" name="name" placeholder="Name" value="<?= htmlspecialchars($user_name) ?>" required>
+                    <input type="email" name="email" placeholder="Email" value="<?= htmlspecialchars($user_email) ?>" required>
+                    <input type="password" name="password" placeholder="New Password">
+                    <input type="password" name="confirm_password" placeholder="Confirm New Password">
+                    <button type="submit" name="update_profile" class="update-btn">Update Profile</button>
+                </form>
+            </div>
 
-    <button type="submit" name="update_profile"><i class="fas fa-save"></i> Update Profile</button>
-</form>
-</div>
+            <!-- Info Panel -->
+            <div class="info-card">
+                <h3>Key Information</h3>
+                <div class="info-item"><span>Total Branches</span><span><?= $total_branches ?></span></div>
+                <div class="info-item"><span>Total Users</span><span><?= $total_users ?></span></div>
+                <div class="info-item"><span>Total Sales (₱)</span><span><?= number_format($total_sales,2) ?></span></div>
+                <div class="info-item"><span>Total Eggs Sold</span><span><?= $total_eggs ?></span></div>
+            </div>
+
+        </div>
+    </div>
 
 </div>
-
-<script>
-function previewPhoto(event){
-    const reader = new FileReader();
-    reader.onload = function(){
-        document.getElementById('profilePreview').src = reader.result;
-    }
-    reader.readAsDataURL(event.target.files[0]);
-}
-</script>
 
 </body>
 </html>
